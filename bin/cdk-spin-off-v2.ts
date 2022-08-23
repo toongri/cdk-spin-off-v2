@@ -4,6 +4,6 @@ import * as cdk from 'aws-cdk-lib';
 import { CdkSpinOffV2Stack } from '../lib/cdk-spin-off-v2-stack';
 
 const app = new cdk.App();
-new CdkSpinOffV2Stack(app, 'CdkSpinOffV2Stack', {
+new CdkSpinOffV2Stack(app, 'CdkSpinOffV2Stack');
 
-});
+app.synth();
