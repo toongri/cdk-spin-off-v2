@@ -9,8 +9,7 @@ export class SecurityGroupStack extends Stack {
 
         const albSg = new CfnSecurityGroup(
             this,
-            'spin-off-alb-sg',
-            {
+            'spin-off-alb-sg', {
                 groupDescription: 'alb-sg', // 보안그룹 설명
                 groupName: 'spin-off-alb-sg', // 보안그룹 이름
                 vpcId: Fn.importValue('vpc-id'), // Fn.importValue -> 다른 스택에서 내보낸 출력 값 반환
@@ -31,8 +30,7 @@ export class SecurityGroupStack extends Stack {
         // Create Bastion Sg
         const bastionSg = new CfnSecurityGroup(
             this,
-            'spin-off-bastion-sg',
-            {
+            'spin-off-bastion-sg', {
                 groupDescription: 'bastion-sg',
                 groupName: 'spin-off-bastion-sg',
                 vpcId: Fn.importValue('vpc-id'),
@@ -47,8 +45,7 @@ export class SecurityGroupStack extends Stack {
 
         const rdsSg = new CfnSecurityGroup(
             this,
-            'spin-off-RDS',
-            {
+            'spin-off-RDS', {
                 groupDescription: 'mysql-sg',
                 groupName: 'spin-off-mysql-sg',
                 vpcId: Fn.importValue('vpc-id'),
