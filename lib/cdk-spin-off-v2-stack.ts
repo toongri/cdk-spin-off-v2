@@ -6,6 +6,7 @@ import {SecurityGroupStack} from "./security-group.stack";
 import {S3Stack} from "./s3.stack";
 import {CloudWatchLogStack} from "./cloud-watch-log.stack";
 import {AlbTargetGroupStack} from "./alb-target-group.stack";
+import {BastionEc2Stack} from "./bastion-ec2.stack";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class CdkSpinOffV2Stack extends cdk.Stack {
@@ -18,11 +19,13 @@ export class CdkSpinOffV2Stack extends cdk.Stack {
     const s3Stack = new S3Stack(this, "S3Stack");
     const cloudWatchLogStack = new CloudWatchLogStack(this, 'CloudWatchLogStack');
     const albTargetGroupStack = new AlbTargetGroupStack(this, 'AlbTargetGroupStack');
+    const bastionEc2Stack = new BastionEc2Stack(this, 'BastionEc2Stack');
 
     vpcSubnetStack.addDependency(iamRoleStack);
     securityGroupStack.addDependency(vpcSubnetStack);
     s3Stack.addDependency(securityGroupStack);
     cloudWatchLogStack.addDependency(s3Stack);
     albTargetGroupStack.addDependency(cloudWatchLogStack);
+    bastionEc2Stack.addDependency(albTargetGroupStack);
   }
 }
