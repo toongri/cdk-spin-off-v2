@@ -1,6 +1,13 @@
 import {CfnOutput, Stack, StackProps} from "aws-cdk-lib";
 import {Construct} from "constructs";
-import {ManagedPolicy, PolicyDocument, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
+import {
+    CompositePrincipal,
+    ManagedPolicy,
+    PolicyDocument,
+    PolicyStatement,
+    Role,
+    ServicePrincipal
+} from "aws-cdk-lib/aws-iam";
 
 export class IamRoleStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
@@ -59,16 +66,53 @@ export class IamRoleStack extends Stack {
                 ],
         });
 
+        //SSM RDS Role
+        const rdsSsmRole = new Role(
+            this,
+            'spin-off-ssm-iam-role',{
+                assumedBy: new CompositePrincipal(
+                    new ServicePrincipal('rds.amazonaws.com'),
+                    new ServicePrincipal('ssm.amazonaws.com')),
+                roleName: 'spin-off-ssm-rds-iam-role',
+                inlinePolicies: { // 정책목록 리스트화
+                    SSMRolePolicy: new PolicyDocument({ // statement 들의 컬렉션 클래스
+                        statements: [new PolicyStatement({ //statement -> 정책의 주요 요소 pli
+                            resources: ['*'], // 리소스 모음 -> 모든 uri에 대해 허용한다.
+                            actions: [
+                                's3:*',
+                                'cloudwatch:*',
+                                'logs:*',
+                                'rds:*',
+                                'ssm:*'
+                            ], // 작업 모음 -> s3가 할수있는 모든 작업을 허용한다.
+                        })],
+                    }),
+                },
+                managedPolicies: [
+                    ManagedPolicy.fromManagedPolicyArn(
+                        this,
+                        "AmazonSSMManagedInstanceCore",
+                        'arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore'
+                    )
+                ]
+            }
+        );
+
         // print the IAM role arn for this service account
         new CfnOutput(this, "ecs-task-role", {
             value: ecsTaskRole.roleArn,
             exportName: "ecs-task-role-arn",
-        })
+        });
 
         new CfnOutput(this, "ecs-execution-role", {
             value: ecsExecutionRole.roleArn,
             exportName: "ecs-execution-role-arn",
-        })
+        });
+
+        new CfnOutput(this, "rds-ssm-role", {
+            value: rdsSsmRole.roleArn,
+            exportName: "rds-ssm-role-arn",
+        });
 
     }
 }
