@@ -2,6 +2,7 @@ import {CfnOutput, Stack, StackProps} from "aws-cdk-lib";
 import {Construct} from "constructs";
 import {
     CompositePrincipal,
+    Effect,
     ManagedPolicy,
     PolicyDocument,
     PolicyStatement,
@@ -65,6 +66,31 @@ export class IamRoleStack extends Stack {
                     )
                 ],
         });
+
+        // Code Deploy Role
+        // new Role(
+        //     this,
+        //     'spin-off-codedeploy-iam-role',{
+        //         assumedBy: new ServicePrincipal('codedeploy.amazonaws.com'),
+        //         roleName: 'spin-off-codedeploy-iam-role',
+        //         inlinePolicies: {
+        //             policy: new PolicyDocument({
+        //                 statements: [new PolicyStatement({
+        //                     sid: 'RegisterTaskDefinition',
+        //                     effect: Effect.ALLOW,
+        //                     actions: ['ecs:RegisterTaskDefinition'],
+        //                     resources: ['*']
+        //                 }), new PolicyStatement({
+        //                     sid: 'PassRolesInTaskDefinition',
+        //                     effect: Effect.ALLOW,
+        //                     actions: ['iam:PassRole'],
+        //                     resources:[
+        //                         ''
+        //                     ]
+        //                 })]
+        //             })}
+        //     }
+        // )
 
         //SSM RDS Role
         const rdsSsmRole = new Role(

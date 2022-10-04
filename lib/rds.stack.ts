@@ -49,6 +49,7 @@ export class RdsStack extends Stack {
                     'character_set_client': 'utf8mb4',
                     'collation_connection': 'utf8mb4_unicode_ci',
                     'collation_server': 'utf8mb4_unicode_ci',
+                    'time_zone': 'Asia/Seoul'
                 }
             }
         );

@@ -1,6 +1,6 @@
 import {CfnOutput, Fn, Stack, StackProps} from "aws-cdk-lib";
 import {Construct} from "constructs";
-import {CfnSecurityGroup} from "aws-cdk-lib/aws-ec2";
+import {CfnSecurityGroup, CfnSecurityGroupEgress} from "aws-cdk-lib/aws-ec2";
 
 export class SecurityGroupStack extends Stack {
 
@@ -23,7 +23,38 @@ export class SecurityGroupStack extends Stack {
                     cidrIp: '0.0.0.0/0',
                     fromPort: 80,
                     toPort: 80,
+                }, {
+                    ipProtocol: 'tcp',
+                    cidrIp: '0.0.0.0/0',
+                    fromPort: 8080,
+                    toPort: 8080,
                 }],
+            }
+        );
+
+        const ecsSg = new CfnSecurityGroup(
+            this,
+            'spin-off-ecs-sg', {
+                groupDescription: 'ecs-sg', // 보안그룹 설명
+                groupName: 'spin-off-ecs-sg', // 보안그룹 이름
+                vpcId: Fn.importValue('vpc-id'), // Fn.importValue -> 다른 스택에서 내보낸 출력 값 반환
+                securityGroupIngress: [{
+                    ipProtocol: 'tcp',
+                    sourceSecurityGroupId: albSg.ref,
+                    fromPort: 8080,
+                    toPort: 8080,
+                }],
+            }
+        );
+
+        new CfnSecurityGroupEgress(
+            this,
+            'spin-off-ecs-sg-egress', {
+                groupId: albSg.ref,
+                fromPort: 8080,
+                toPort: 8080,
+                destinationSecurityGroupId: ecsSg.ref,
+                ipProtocol: 'tcp'
             }
         );
 
@@ -51,7 +82,8 @@ export class SecurityGroupStack extends Stack {
                 vpcId: Fn.importValue('vpc-id'),
                 securityGroupIngress: [{
                     ipProtocol: 'tcp',
-                    sourceSecurityGroupId: bastionSg.ref,
+                    // sourceSecurityGroupId: bastionSg.ref,
+                    cidrIp: '0.0.0.0/0',
                     fromPort: 3306,
                     toPort: 3306,
                 }],
@@ -63,6 +95,14 @@ export class SecurityGroupStack extends Stack {
             "alb-sg", {
                 value: albSg.ref,
                 exportName: 'alb-sg',
+            }
+        );
+
+        new CfnOutput(
+            this,
+            "ecs-sg", {
+                value: ecsSg.ref,
+                exportName: 'ecs-sg',
             }
         );
         new CfnOutput(

@@ -8,6 +8,8 @@ import {CloudWatchLogStack} from "./cloud-watch-log.stack";
 import {AlbTargetGroupStack} from "./alb-target-group.stack";
 import {BastionEc2Stack} from "./bastion-ec2.stack";
 import {RdsStack} from "./rds.stack";
+import {EcrStack} from "./ecr.stack";
+import {EcsStack} from "./ecs.stack";
 
 export class CdkSpinOffV2Stack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -21,6 +23,8 @@ export class CdkSpinOffV2Stack extends cdk.Stack {
     const albTargetGroupStack = new AlbTargetGroupStack(this, 'AlbTargetGroupStack');
     const bastionEc2Stack = new BastionEc2Stack(this, 'BastionEc2Stack');
     const rdsStack = new RdsStack(this, 'RdsStack');
+    const ecrStack = new EcrStack(this, 'EcrStack');
+    const ecsStack = new EcsStack(this, 'EcsStack');
 
     vpcSubnetStack.addDependency(iamRoleStack);
     securityGroupStack.addDependency(vpcSubnetStack);
@@ -29,5 +33,7 @@ export class CdkSpinOffV2Stack extends cdk.Stack {
     albTargetGroupStack.addDependency(cloudWatchLogStack);
     bastionEc2Stack.addDependency(albTargetGroupStack);
     rdsStack.addDependency(bastionEc2Stack);
+    ecrStack.addDependency(rdsStack);
+    ecsStack.addDependency(ecrStack);
   }
 }

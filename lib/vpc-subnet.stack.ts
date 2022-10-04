@@ -202,7 +202,7 @@ export class VpcSubnetStack extends Stack {
 
         new CfnOutput(
             this,
-            "public-subnet-1", {
+            "public-subnet-1-id", {
                 value: publicSubnet1.ref,
                 exportName: "public-subnet-1-id",
             }
@@ -210,7 +210,7 @@ export class VpcSubnetStack extends Stack {
 
         new CfnOutput(
             this,
-            "public-subnet-2", {
+            "public-subnet-2-id", {
                 value: publicSubnet2.ref,
                 exportName: "public-subnet-2-id",
             }
@@ -218,7 +218,7 @@ export class VpcSubnetStack extends Stack {
 
         new CfnOutput(
             this,
-            "private-subnet-1", {
+            "private-subnet-1-id", {
                 value: privateSubnet1.ref,
                 exportName: "private-subnet-1-id",
             }
@@ -226,7 +226,7 @@ export class VpcSubnetStack extends Stack {
 
         new CfnOutput(
             this,
-            "private-subnet-2", {
+            "private-subnet-2-id", {
                 value: privateSubnet2.ref,
                 exportName: "private-subnet-2-id",
             }

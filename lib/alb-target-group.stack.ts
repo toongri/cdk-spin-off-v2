@@ -1,4 +1,4 @@
-import {aws_elasticloadbalancingv2, CfnOutput, Fn, Stack, StackProps} from "aws-cdk-lib";
+import {aws_elasticloadbalancingv2, CfnOutput, Duration, Fn, Stack, StackProps} from "aws-cdk-lib";
 import {Construct} from "constructs";
 import {SecurityGroup, Subnet, Vpc} from "aws-cdk-lib/aws-ec2";
 import {
@@ -54,19 +54,20 @@ export class AlbTargetGroupStack extends Stack {
         //Create Listener (API ALB Listener 80)
         const spinOffApiAlbListener = new ApplicationTargetGroup(
             this,
-            'spin-off-api-alb-listener',{
-                port: 80,
+            'spin-off-api-alb-listener-80',{
+                port: 8080,
                 targetGroupName: 'spin-off-api-alb-listener',
                 healthCheck: {
-                    path: '/api/healthcheck'
+                    path: '/healthCheck',
+                    timeout: Duration.seconds(120),
+                    interval: Duration.seconds(180),
                 },
                 vpc: spinOffVpc,
                 targetType: TargetType.IP,
             }
         );
 
-        // Add 80 Listener (API ALB)
-        const spinOffApiAlbAddListener = spinOffApiAlb.addListener(
+        const spinOffApiAlbAddListener80 = spinOffApiAlb.addListener(
             'spin-off-api-alb-add-listener-80',{
                 protocol: ApplicationProtocol.HTTP,
                 port: 80,
@@ -75,9 +76,7 @@ export class AlbTargetGroupStack extends Stack {
                 ])
             }
         );
-
         //output
-
         new CfnOutput(
             this,
             'alb-arn',{
